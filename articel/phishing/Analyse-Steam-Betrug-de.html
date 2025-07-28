@@ -6,23 +6,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <link rel="stylesheet" href="../../assets/blog.css">
+  <style>
+    /* Entfernt Hover-Effekte der Navbar nur für diese Seite */
+    .navbar:hover {
+      box-shadow: 0 2px 8px #e0e7ef !important;
+      transform: none !important;
+    }
+    .navbar a:hover {
+      background: none !important;
+      color: #2e3a4d !important;
+    }
+  </style>
 </head>
 <body>
   <!-- Navigationsleiste -->
   <nav class="navbar">
     <div class="navbar-nav">
-      <a href="https://daonware-it.github.io/">Startseite</a>
-      <a href="https://daonware-it.github.io/artikel.html">Artikel</a>
+      <a href="../../index.html?lang=de">Startseite</a>
+      <a href="../../articel.html?lang=de">Artikel</a>
     </div>
   </nav>
-  <div class="search-box">
-    <form action="#" method="get" style="display:flex;align-items:center;gap:0.5em;justify-content:center;">
-      <input type="text" placeholder="Suche im Artikel..." aria-label="Suche">
-      <button type="submit" aria-label="Suchen">
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      </button>
-    </form>
-  </div>
   <section class="lang-box" aria-label="Sprachauswahl">
     <div style="display:flex;align-items:center;justify-content:center;gap:0.7em;margin-bottom:0.5em;"><span style="font-size:1.7em;">🌐</span><h2 style="margin:0;color:#333;font-family:'Montserrat',Arial,sans-serif;font-size:1.25em;font-weight:700;letter-spacing:0.02em;">Sprache wählen</h2></div>
     <p style="margin:0 0 1.2em 0;color:#555;font-size:1em;font-family:'Merriweather',Georgia,serif;">Wähle die gewünschte Sprache für den Beitrag:</p>
