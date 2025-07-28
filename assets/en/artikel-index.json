@@ -1,0 +1,17 @@
+{
+  "nav": {
+    "home": "Home",
+    "articles": "Articles"
+  },
+  "searchPlaceholder": "Search in the articles...",
+  "readMore": "Read more",
+  "noResultsText": "No matching article found.<br>Please try another search term!",
+  "articles": [
+    {
+      "title": "Steam Phishing Analysis",
+      "subtitle": "How scammers trick Steam users",
+      "description": "A detailed analysis of typical phishing methods using Steam as an example.",
+      "url": "phishing/Analyse-Steam-Fraud-en.md"
+    }
+  ]
+}

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <script>
+    function getLangFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const lang = params.get('lang');
+      if (lang === 'en' || lang === 'de') return lang;
+      return 'de';
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      const deBtn = document.querySelector('.lang-btn[aria-label="Deutsch"]');
+      const enBtn = document.querySelector('.lang-btn[aria-label="English"]');
+      let currentLang = document.documentElement.lang;
+      // Sprache aus URL-Parameter übernehmen
+      currentLang = getLangFromUrl();
+      setTimeout(function() {
+        deBtn.classList.toggle('active', currentLang === 'de');
+        enBtn.classList.toggle('active', currentLang === 'en');
+      }, 0);
+
+      function loadContent(lang) {
+        let contentFile = 'assets/de/index-content.json';
+        if (lang === 'en') contentFile = 'assets/en/index-content.json';
+        fetch(contentFile)
+          .then(response => response.json())
+          .then(data => {
+            document.documentElement.lang = lang;
+            deBtn.classList.toggle('active', lang === 'de');
+            enBtn.classList.toggle('active', lang === 'en');
+            // Hero
+            document.getElementById('hero-headline').textContent = data.hero.headline;
+            document.getElementById('hero-subline').textContent = data.hero.subline;
+            // Intro
+            document.getElementById('intro-headline').textContent = data.intro.headline;
+            document.getElementById('intro-text').textContent = data.intro.text;
+            // Services
+            const serviceBoxes = document.querySelectorAll('.service-box');
+            data.services.forEach((service, i) => {
+              if (serviceBoxes[i]) {
+                serviceBoxes[i].querySelector('.service-title').textContent = service.title;
+                serviceBoxes[i].querySelector('.service-text').textContent = service.description;
+              }
+            });
+            // About
+            document.getElementById('about-title').textContent = data.about.title;
+            document.getElementById('about-text').textContent = data.about.text;
+            // Artikel-Block
+            document.getElementById('articles-title').textContent = data.articles.title;
+            document.getElementById('articles-desc').textContent = data.articles.description;
+            document.getElementById('articles-btn').textContent = data.articles.button;
+            // Navigation
+            const navLinks = document.querySelectorAll('.navbar-nav a');
+            if (navLinks[0]) navLinks[0].textContent = data.nav.home;
+            if (navLinks[1]) navLinks[1].textContent = data.nav.articles;
+            if (navLinks[1]) {
+              navLinks[1].textContent = data.nav.articles;
+              navLinks[1].href = lang === 'en' ? 'articel.html?lang=en' : 'articel.html?lang=de';
+            }
+            const articlesBtn = document.getElementById('articles-btn');
+            articlesBtn.textContent = data.articles.button;
+            articlesBtn.href = lang === 'en' ? 'articel.html?lang=en' : 'articel.html?lang=de';
+            // Search Placeholder
+            const searchInput = document.querySelector('.search-box input[type="text"]');
+            if (searchInput && data.searchPlaceholder) {
+              searchInput.placeholder = data.searchPlaceholder;
+            }
+          });
+      }
+
+      deBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        loadContent('de');
+      });
+      enBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        loadContent('en');
+      });
+
+      loadContent(currentLang);
+    });
+  </script>
+  <script src="assets/search.js"></script>
+  <meta charset="UTF-8">
+  <title>DaonWare – IT, Programmieren & Cybersicherheit</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="banner">
+    DaonWare
+  </header>
+  <div class="lang-switch">
+    <button class="lang-btn active" aria-label="Deutsch">🇩🇪 DE</button>
+    <button class="lang-btn" aria-label="English">🇬🇧 EN</button>
+  </div>
+  <nav class="navbar">
+    <div class="navbar-nav">
+      <a href="#">Startseite</a>
+      <a href="articel.html">Artikel</a>
+    </div>
+  </nav>
+  <div class="search-box">
+    <form action="#" method="get" style="display:flex;align-items:center;gap:0.5em;justify-content:center;">
+      <input type="text" placeholder="Suche auf DaonWare..." aria-label="Suche">
+      <button type="submit" aria-label="Suchen">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;">
+          <circle cx="10" cy="10" r="7" stroke="#fff" stroke-width="2" fill="none"/>
+          <line x1="16" y1="16" x2="21" y2="21" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </form>
+  </div>
+  <div class="blog-container">
+    <div id="no-results" style="display:none;color:#b8860b;font-size:1.15em;text-align:center;margin:2em 0 1em 0;">Leider konnten wir Ihren Artikel nicht finden.</div>
+    <section class="hero">
+      <h1 id="hero-headline">Malware Analyse, Cybersicherheit &amp; IT-Wissen</h1>
+      <p id="hero-subline">DaonWare bietet dir praxisnahe Einblicke in Malware-Analyse, Cybersicherheit und digitale Forensik. Hier findest du Tipps, Tutorials und Analysen für Einsteiger und Profis – immer mit dem Ziel, dich vor Bedrohungen im Netz zu schützen.</p>
+    </section>
+    <section id="services" style="display:flex;gap:2em;flex-wrap:wrap;justify-content:center;margin:2em 0;">
+      <div class="article-preview service-box" style="max-width:340px;">
+        <h3 class="service-title">Malware Analyse</h3>
+        <p class="service-text">Praktische Analyse von Schadsoftware, Tools und Forensik, Aufklärung und Schutzmaßnahmen. Für Einsteiger und Profis: Lerne, wie Malware funktioniert und wie du dich schützt.</p>
+      </div>
+      <div class="article-preview service-box" style="max-width:340px;">
+        <h3 class="service-title">Cybersicherheit</h3>
+        <p class="service-text">Schutz vor Phishing, Scam und Exploits. TryHackMe, HackTheBox, Tipps, Tutorials und Analysen. <strong>Slogan:</strong> Immer misstrauisch sein und sich nicht überrumpeln lassen!</p>
+      </div>
+      <div class="article-preview service-box" style="max-width:340px;">
+        <h3 class="service-title">3D-Modellierung</h3>
+        <p class="service-text">Von stylischer Poly-Art bis zu realistischen Details: Ich erstelle 3D-Modelle für Charaktere und Umgebungen, die Ihre Vision lebendig machen.</p>
+      </div>
+    </section>
+    <section id="intro-block" style="margin:2em 0;text-align:center;">
+      <h2 id="intro-headline">Malware Analyse, Cybersicherheit &amp; IT-Wissen</h2>
+      <p id="intro-text">DaonWare bietet dir praxisnahe Einblicke in Malware-Analyse, Cybersicherheit und digitale Forensik. Hier findest du Tipps, Tutorials und Analysen für Einsteiger und Profis – immer mit dem Ziel, dich vor Bedrohungen im Netz zu schützen.</p>
+    </section>
+    <section id="about-block" style="margin:2em 0;text-align:center;">
+      <h2 id="about-title">Über DaonWare</h2>
+      <p id="about-text">DaonWare bietet Know-how rund um IT-Sicherheit, Forensik und Softwareentwicklung.</p>
+    </section>
+    <section id="blog" style="margin:2em 0;text-align:center;">
+      <h2 id="articles-title">Artikel &amp; Erfolgsgeschichten</h2>
+      <p id="articles-desc">In den Artikeln findest du spannende Einblicke in meine Projekte, Tutorials und Erfolgsgeschichten rund um Cybersicherheit, Malware-Analyse und IT.</p>
+      <a href="articel.html" class="blog-link" id="articles-btn">Zu den Artikeln</a>
+    </section>
+  </div>
+  <footer class="footer">
+    &copy; 2025 DaonWare &ndash; Spieleentwicklung &amp; IT
+  </footer>
+</body>
+</html>

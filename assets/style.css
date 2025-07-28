@@ -1,0 +1,384 @@
+/* Seitenanzeige-Box für die Paginierung */
+.page-info-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  background: #eaf6ff;
+  border: 1.5px solid #cce4fc;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px #e0e7ef;
+  padding: 0.5em 1.2em;
+  color: #0066cc;
+  font-size: 1.08em;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-weight: 500;
+  margin: 0 1em;
+}
+.page-info-icon {
+  display: flex;
+  align-items: center;
+}
+.page-info-text strong {
+  color: #00bfff;
+  font-weight: 700;
+}
+/* Info-Box für keine Suchergebnisse */
+.no-results-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #eaf6ff;
+  border: 1.5px solid #cce4fc;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px #e0e7ef;
+  padding: 2em 1.5em;
+  margin: 2em auto 1em auto;
+  max-width: 500px;
+  color: #0066cc;
+  font-size: 1.15em;
+  font-family: 'Montserrat', Arial, sans-serif;
+}
+.no-results-icon {
+  margin-bottom: 0.7em;
+  display: block;
+}
+.no-results-text {
+  text-align: center;
+  color: #0066cc;
+  font-size: 1.08em;
+  font-weight: 500;
+}
+/* Pagination Buttons */
+.page-info-box {
+  display: inline-flex;
+  align-items: center;
+  background: #eaf6ff;
+  border: 1.5px solid #cce4fc;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px #e0e7ef;
+  padding: 0.5em 1.2em;
+  color: #0066cc;
+  font-size: 1.08em;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-weight: 500;
+  margin: 0 1em;
+  height: 40px;
+  vertical-align: middle;
+}
+#pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  margin: 2em 0;
+}
+.pagination-btn {
+  background: linear-gradient(90deg, #0066cc 0%, #00bfff 100%);
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  padding: 0.6em 1.4em;
+  margin: 0 0.5em;
+  font-size: 1em;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,102,204,0.08);
+  transition: background 0.2s, transform 0.2s;
+}
+.pagination-btn:hover {
+  background: linear-gradient(90deg, #00bfff 0%, #0066cc 100%);
+  transform: translateY(-2px) scale(1.04);
+}
+.wide-preview {
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto 2em auto;
+  padding: 2em 2.5em 1.5em 2.5em;
+  box-shadow: 0 6px 32px #e0e7ef;
+  background: linear-gradient(120deg, #eaf6ff 0%, #f8f9fa 100%);
+  border-radius: 18px;
+  border: 1px solid #cce4fc;
+  display: block;
+}
+.wide-preview:hover {
+  box-shadow: 0 12px 48px #cce4fc;
+  transform: scale(1.01);
+}
+.preview-title {
+  font-size: 2em;
+  color: #0066cc;
+  font-weight: 700;
+  margin-bottom: 0.3em;
+  letter-spacing: 0.01em;
+}
+.preview-subtitle {
+  font-size: 1.1em;
+  color: #888;
+  margin-bottom: 1em;
+}
+.preview-text {
+  font-size: 1.15em;
+  color: #2e3a4d;
+  line-height: 1.7;
+  margin-bottom: 0.5em;
+}
+/* Blog-Link Button */
+.blog-link {
+  display: inline-block;
+  background: #eaf6ff;
+  color: #0066cc;
+  padding: 0.7em 1.5em;
+  border-radius: 8px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px #e0e7ef;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+  font-family: 'Montserrat', Arial, sans-serif;
+}
+.blog-link:hover {
+  background: #d0eaff;
+  color: #004080;
+}
+/* Banner für DaonWare */
+.banner {
+  width: 100%;
+  background: linear-gradient(90deg, #0066cc 0%, #00bfff 100%);
+  color: #fff;
+  text-align: center;
+  padding: 1.3em 0 0.8em 0;
+  font-size: 2.4em;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  box-shadow: 0 2px 12px #e0e7ef;
+  font-family: 'Montserrat', Arial, sans-serif;
+  border-radius: 0 0 18px 18px;
+  margin-bottom: 0.5em;
+}
+@media (max-width: 700px) {
+  .banner {
+    font-size: 1.5em;
+    padding: 1em 0 0.6em 0;
+    border-radius: 0 0 12px 12px;
+  }
+}
+/* Navbar modernisieren */
+/* Navbar aus blog.css übernommen */
+.navbar {
+  width: 100%;
+  background: #fff;
+  box-shadow: 0 2px 8px #e0e7ef;
+  border-radius: 12px;
+  border: 1px solid #e0e7ef;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.7em 0.5em;
+  margin: 0 auto 2em auto;
+}
+/* entfernt: .navbar .search-box Styles, da die Suchleiste nun außerhalb der Navbar ist */
+.navbar-nav {
+  display: flex;
+  gap: 2em;
+  font-size: 1.13em;
+  margin: 0 auto;
+  width: max-content;
+  z-index: 2;
+}
+.navbar a {
+  color: #2e3a4d;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 0.3em 0.7em;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
+  letter-spacing: 0.01em;
+  font-family: 'Montserrat', Arial, sans-serif;
+}
+.navbar {
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+@media (max-width: 600px) {
+  .navbar-nav {
+    gap: 1em;
+    font-size: 1em;
+  }
+  .navbar {
+    padding: 0.5em 0.2em;
+  }
+}
+@media (max-width: 700px) {
+  .navbar-nav {
+    gap: 1em;
+    padding: 0.7em 0;
+  }
+  .navbar-nav a {
+    font-size: 1em;
+    padding: 0.3em 0.5em;
+  }
+}
+/* Blog-Container für die Startseite */
+.blog-container {
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e0e7ef;
+  box-shadow: none;
+  padding: 3.5em 4em;
+  margin: 2em auto;
+  max-width: 1400px;
+  display: flex;
+  flex-direction: column;
+  gap: 3em;
+}
+@media (max-width: 700px) {
+  .blog-container {
+    padding: 1em 0.5em;
+    max-width: 100%;
+  }
+}
+/* Modernes, freundliches Design für die Startseite */
+.lang-switch {
+  display: flex;
+  gap: 0.5em;
+  justify-content: flex-end;
+  margin: 1em 2em 0 0;
+}
+.lang-btn {
+  background: #eaf6ff;
+  color: #0066cc;
+  border: none;
+  border-radius: 8px;
+  padding: 0.4em 1.1em;
+  font-size: 1em;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #e0e7ef;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.lang-btn.active, .lang-btn:hover {
+  background: linear-gradient(90deg, #eaf6ff 0%, #d0eaff 100%);
+  color: #004080;
+  box-shadow: none;
+}
+.hero {
+  text-align: center;
+  padding: 2em 0;
+}
+.hero h1 {
+  font-size: 2.5em;
+  margin-bottom: 0.3em;
+}
+.hero p {
+  font-size: 1.2em;
+  color: #555;
+}
+.hero img {
+  max-width: 180px;
+  width: 100%;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px #cce4fc;
+  margin-bottom: 1em;
+}
+.warn-box {
+  background: #fffbe6;
+  border-radius: 8px;
+  border: 1px solid #f7e9b7;
+  box-shadow: none;
+  padding: 1em 1.2em;
+  margin: 2em 0;
+}
+
+.article-preview {
+  background: linear-gradient(120deg, #eaf6ff 0%, #f8f9fa 100%);
+  border-radius: 14px;
+  border: 1px solid #cce4fc;
+  box-shadow: 0 4px 18px #e0e7ef;
+  padding: 1.3em 1.3em 1.1em 1.3em;
+  margin-bottom: 1.7em;
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.article-preview:hover {
+  box-shadow: 0 8px 32px #cce4fc;
+  transform: scale(1.025);
+}
+.article-preview h3 {
+  margin-top: 0;
+  font-size: 1.45em;
+  color: #0066cc;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.5em;
+}
+.article-preview p {
+  margin-bottom: 0.5em;
+  font-size: 1.08em;
+  color: #2e3a4d;
+  line-height: 1.6;
+}
+.article-preview strong {
+  display: inline-block;
+  background: #fffbe6;
+  color: #b8860b;
+  font-weight: 700;
+  padding: 0.2em 0.7em;
+  border-radius: 6px;
+  margin-top: 0.7em;
+  margin-bottom: 0.3em;
+  font-size: 1em;
+}
+.search-box {
+  margin: 2em auto 2em auto;
+  max-width: 500px;
+  text-align: center;
+}
+.search-box input {
+  width: 70%;
+  padding: 0.7em;
+  border-radius: 8px;
+  border: 1px solid #e0e7ef;
+  font-size: 1.08em;
+}
+.search-box button {
+  padding: 0.7em 1.2em;
+  border-radius: 8px;
+  border: none;
+  background: #0066cc;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.search-box button:hover {
+  background: #004080;
+}
+.footer {
+  text-align: center;
+  color: #888;
+  font-size: 1em;
+  padding: 2em 0 1em 0;
+}
+blockquote {
+  font-size: 1.08em;
+  color: #2e3a4d;
+  background: #fffbe6;
+  border-left: 4px solid #b8860b;
+  padding: 0.7em 1em;
+  border-radius: 6px;
+  box-shadow: none;
+  margin: 1.5em auto;
+  max-width: 650px;
+}
+@media (max-width: 700px) {
+  .hero img, .about-box img, .article-preview img {
+    max-width: 60px;
+  }
+  .search-box input {
+    width: 100%;
+  }
+}

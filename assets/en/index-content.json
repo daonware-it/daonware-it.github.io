@@ -1,0 +1,41 @@
+{
+  "searchPlaceholder": "Search on DaonWare...",
+  "nav": {
+    "home": "Home",
+    "articles": "Articles"
+  },
+  "hero": {
+    "headline": "Malware Analysis, Cybersecurity & IT Knowledge",
+    "subline": "DaonWare offers you practical insights into malware analysis, cybersecurity and digital forensics. Here you will find tips, tutorials and analyses for beginners and professionals – always with the goal of protecting you from threats on the web."
+  },
+  "services": [
+    {
+      "title": "Malware Analysis",
+      "description": "Practical analysis of malware, tools and forensics, education and protection measures. For beginners and professionals: Learn how malware works and how to protect yourself."
+    },
+    {
+      "title": "Cybersecurity",
+      "description": "Protection against phishing, scams and exploits. TryHackMe, HackTheBox, tips, tutorials and analyses. Slogan: Always be suspicious and don't get caught off guard!"
+    },
+    {
+      "title": "3D Modeling",
+      "description": "From stylish poly-art to realistic details: I create 3D models for characters and environments that bring your vision to life."
+    }
+  ],
+  "about": {
+    "title": "About DaonWare",
+    "text": "DaonWare offers expertise in IT security, forensics and software development."
+  },
+  "intro": {
+    "headline": "Malware Analysis, Cybersecurity & IT Knowledge",
+    "text": "DaonWare offers you practical insights into malware analysis, cybersecurity and digital forensics. Here you will find tips, tutorials and analyses for beginners and professionals – always with the goal of protecting you from threats on the web."
+  },
+  "articles": {
+    "title": "Articles & Success Stories",
+    "description": "In the articles you will find exciting insights into my projects, tutorials and success stories about cybersecurity, malware analysis and IT.",
+    "button": "To the articles"
+  },
+  "footer": {
+    "text": "© 2025 DaonWare – Game Development & IT"
+  }
+}

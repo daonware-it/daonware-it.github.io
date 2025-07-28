@@ -1,0 +1,17 @@
+{
+  "nav": {
+    "home": "Startseite",
+    "articles": "Artikel"
+  },
+  "searchPlaceholder": "Suche in den Artikeln...",
+  "readMore": "Weiterlesen",
+  "noResultsText": "Kein passender Artikel gefunden.<br>Bitte probiere einen anderen Suchbegriff!",
+  "articles": [
+    {
+      "title": "Steam Phishing Analyse",
+      "subtitle": "Wie Betrüger Steam-Nutzer täuschen",
+      "description": "Eine detaillierte Analyse typischer Phishing-Methoden am Beispiel Steam.",
+      "url": "phishing/Analyse-Steam-Betrug-de.html"
+    }
+  ]
+}

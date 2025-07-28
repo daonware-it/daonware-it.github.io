@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <script>
+    let artikelData = [];
+    let filteredData = [];
+    let currentPage = 1;
+    document.addEventListener('DOMContentLoaded', function() {
+      // Sprache aus URL-Parameter erkennen
+      function getLangFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        const lang = params.get('lang');
+        if (lang === 'en' || lang === 'de') return lang;
+        return 'de';
+      }
+      // Sprachumschaltung und dynamisches Laden der Artikel
+      const deBtn = document.querySelector('.lang-btn[aria-label="Deutsch"]');
+      const enBtn = document.querySelector('.lang-btn[aria-label="English"]');
+      const articlesPerPage = 5;
+      const list = document.getElementById('artikel-list');
+      const noResults = document.getElementById('no-results');
+      const pagination = document.getElementById('pagination');
+      const form = document.querySelector('.search-box form');
+      const input = form.querySelector('input');
+      const navHome = document.getElementById('home-link');
+      const navArticles = document.querySelector('.navbar-nav a[href="#"]');
+
+      // Übersetzungsdaten für Navigation, Suchfeld und Button
+      let navData = { home: '', articles: '' };
+      let searchPlaceholder = '';
+      let readMoreText = '';
+      let noResultsText = '';
+      function renderArticlesPage(page) {
+        list.innerHTML = '';
+        const start = (page - 1) * articlesPerPage;
+        const end = start + articlesPerPage;
+        const pageArticles = filteredData.slice(start, end);
+        if (pageArticles.length === 0) {
+          noResults.style.display = 'block';
+          const noResultsTextSpan = noResults.querySelector('.no-results-text');
+          if (noResultsTextSpan) {
+            noResultsTextSpan.innerHTML = noResultsText;
+          }
+        } else {
+          noResults.style.display = 'none';
+          pageArticles.forEach(article => {
+            const box = document.createElement('div');
+            box.className = 'article-preview wide-preview';
+            box.innerHTML = `
+              <a href="${article.url}" style="text-decoration:none;">
+                <h2 class="preview-title">${article.title}</h2>
+                <div class="preview-subtitle">${article.subtitle}</div>
+                <p class="preview-text">${article.description}</p>
+              </a>
+              <a href="${article.url}" class="blog-link" style="margin-top:1em;display:inline-block;">${readMoreText}</a>
+            `;
+            list.appendChild(box);
+          });
+        }
+        renderPagination();
+      }
+
+      function renderPagination() {
+        pagination.innerHTML = '';
+        const totalPages = Math.ceil(filteredData.length / articlesPerPage);
+        if (totalPages <= 1) return;
+        if (currentPage > 1) {
+          const prevBtn = document.createElement('button');
+          prevBtn.textContent = '← Vorherige Seite';
+          prevBtn.className = 'pagination-btn';
+          prevBtn.onclick = function() {
+            currentPage--;
+            renderArticlesPage(currentPage);
+          };
+          pagination.appendChild(prevBtn);
+        }
+        const pageInfo = document.createElement('span');
+        pageInfo.className = 'page-info-box';
+        pageInfo.innerHTML = `<span class=\"page-info-text\">Seite <strong>${currentPage}</strong> von <strong>${totalPages}</strong></span>`;
+        pageInfo.style.margin = '0 1em';
+        pagination.appendChild(pageInfo);
+        if (currentPage < totalPages) {
+          const nextBtn = document.createElement('button');
+          nextBtn.textContent = 'Nächste Seite →';
+          nextBtn.className = 'pagination-btn';
+          nextBtn.onclick = function() {
+            currentPage++;
+            renderArticlesPage(currentPage);
+          };
+          pagination.appendChild(nextBtn);
+        }
+      }
+
+      function filterArticles(query) {
+        query = query.trim().toLowerCase();
+        if (query.length === 0) {
+          filteredData = artikelData;
+        } else {
+          filteredData = artikelData.filter(article => {
+            return (
+              article.title.toLowerCase().includes(query) ||
+              article.subtitle.toLowerCase().includes(query) ||
+              article.description.toLowerCase().includes(query)
+            );
+          });
+        }
+        currentPage = 1;
+        renderArticlesPage(currentPage);
+      }
+
+      function loadArticles(lang) {
+        let artikelIndexFile = 'assets/de/artikel-index.json';
+        if (lang === 'en') {
+          artikelIndexFile = 'assets/en/artikel-index.json';
+        }
+        fetch(artikelIndexFile)
+          .then(response => response.json())
+          .then(data => {
+            // Übersetzungsdaten extrahieren
+            navData = data.nav || navData;
+            searchPlaceholder = data.searchPlaceholder || '';
+            readMoreText = data.readMore || '';
+            artikelData = data.articles || [];
+            filteredData = artikelData;
+            currentPage = 1;
+            noResultsText = data.noResultsText || '';
+            // Navigation aktualisieren
+            if (navHome) navHome.textContent = navData.home;
+            if (navArticles) navArticles.textContent = navData.articles;
+            // Suchfeld aktualisieren
+            if (input) input.placeholder = searchPlaceholder;
+            renderArticlesPage(currentPage);
+            input.value = '';
+          });
+      }
+
+      deBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.search = '?lang=de';
+      });
+      enBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.search = '?lang=en';
+      });
+
+      // Initiale Artikel laden je nach Sprache
+      const initialLang = getLangFromUrl();
+      loadArticles(initialLang);
+      document.documentElement.lang = initialLang;
+      deBtn.classList.toggle('active', initialLang === 'de');
+      enBtn.classList.toggle('active', initialLang === 'en');
+
+      input.addEventListener('input', function() {
+        filterArticles(input.value);
+      });
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        filterArticles(input.value);
+      });
+
+      // Falls Suchbegriff per URL-Parameter vorhanden, direkt filtern
+      const params = new URLSearchParams(window.location.search);
+      const search = params.get('search');
+      if (search) {
+        input.value = search;
+        filterArticles(search);
+      }
+    });
+  </script>
+  <script src="assets/search.js"></script>
+  <script>
+    // ...existing code...
+  </script>
+  <meta charset="UTF-8">
+  <title>Artikel – DaonWare</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="banner">
+    DaonWare
+  </header>
+  <div class="lang-switch">
+    <button class="lang-btn active" aria-label="Deutsch">🇩🇪 DE</button>
+    <button class="lang-btn" aria-label="English">🇬🇧 EN</button>
+  </div>
+  <nav class="navbar">
+    <div class="navbar-nav">
+      <a id="home-link" href="index.html">Startseite</a>
+      <a href="#">Artikel</a>
+    </div>
+  </nav>
+  <div class="search-box">
+    <form action="#" method="get" style="display:flex;align-items:center;gap:0.5em;justify-content:center;">
+      <input type="text" placeholder="Suche in den Artikeln..." aria-label="Suche">
+      <button type="submit" aria-label="Suchen">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;">
+          <circle cx="10" cy="10" r="7" stroke="#fff" stroke-width="2" fill="none"/>
+          <line x1="16" y1="16" x2="21" y2="21" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </form>
+  </div>
+  <div class="blog-container">
+    <div id="no-results" class="no-results-box" style="display:none;">
+      <span class="no-results-icon" aria-hidden="true">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;">
+          <circle cx="16" cy="16" r="15" stroke="#00bfff" stroke-width="2" fill="#eaf6ff"/>
+          <path d="M10 20c0-3 4-3 4-6s-4-3-4-6" stroke="#0066cc" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <circle cx="16" cy="22" r="2" fill="#0066cc"/>
+        </svg>
+      </span>
+      <span class="no-results-text">Kein passender Artikel gefunden.<br>Bitte probiere einen anderen Suchbegriff!</span>
+    </div>
+    <div id="artikel-list"></div>
+    <div id="pagination" style="text-align:center;margin:2em 0;"></div>
+  </div>
+  <footer class="footer">
+    &copy; 2025 DaonWare &ndash; Artikel
+  </footer>
+</body>
+<script>
+  // Home-Link dynamisch setzen, falls Sprachparameter vorhanden
+  document.addEventListener('DOMContentLoaded', function() {
+    function getLangFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const lang = params.get('lang');
+      if (lang === 'en' || lang === 'de') return lang;
+      return 'de';
+    }
+    const homeLink = document.getElementById('home-link');
+    const initialLang = getLangFromUrl();
+    if (homeLink) {
+      homeLink.href = initialLang === 'en' ? 'index.html?lang=en' : 'index.html?lang=de';
+    }
+  });
+</script>
+</body>
+</html>
