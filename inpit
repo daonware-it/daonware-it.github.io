@@ -1,0 +1,522 @@
+Okay, I understand. You provided the text in your initial request. I will now process that text according to your instructions.
+
+Here is the rephrased and formatted German text:
+
+---
+
+## Einführung zu Ports und Diensten
+
+Eine **IP-Adresse** identifiziert einen Host im Netzwerk, während ein **TCP- oder UDP-Port** einen spezifischen Netzwerkdienst auf diesem Host bestimmt. Server bieten verschiedene Dienste an, z.B. Uhrzeitdienste, DNS-Anfragen oder Webseiten. Jeder Dienst ist über eine eindeutige Portnummer mit einem Port verknüpft (z.B. HTTP: TCP-Port 80, HTTPS: TCP-Port 443).
+
+**Hinweis:** Pro IP-Adresse kann nur ein Dienst pro Port aktiv sein.
+
+### Port-Zustände
+
+Ports können folgende Zustände aufweisen:
+
+| Zustand           | Bedeutung                                                               |
+| :---------------- | :---------------------------------------------------------------------- |
+| **Offen**         | Ein Dienst lauscht auf dem Port.                                        |
+| **Geschlossen**   | Kein Dienst lauscht, der Port ist jedoch erreichbar.                    |
+| **Gefiltert**     | Nmap kann den Zustand nicht feststellen (oft durch Firewall blockiert). |
+| **Ungefiltert**   | Nmap kann den Zustand nicht bestimmen, der Port ist aber erreichbar.    |
+| **Offen&#124;Gefiltert** | Unklar, ob offen oder gefiltert.                                        |
+| **Geschlossen&#124;Gefiltert** | Unklar, ob geschlossen oder gefiltert.                                  |
+
+### TCP-Port-Scans und der TCP-Header
+
+Nmap unterstützt verschiedene Scan-Arten, deren Verständnis einen Blick auf den **TCP-Header** (24 Bytes) erfordert. Wichtige Flags sind:
+
+*   **URG**: Dringlichkeits-Flag
+*   **ACK**: Bestätigungs-Flag
+*   **PSH**: Push-Flag
+*   **RST**: Rücksetz-Flag
+*   **SYN**: Synchronisierungs-Flag
+*   **FIN**: Verbindung beenden
+
+### TCP Connect Scan (`-sT`)
+
+Der **TCP Connect Scan** baut den vollständigen TCP-Handshake auf:
+1.  Client sendet SYN.
+2.  Server antwortet mit SYN/ACK (wenn offen).
+3.  Client bestätigt mit ACK.
+
+**Tipp:** Dies ist die Standardmethode für unprivilegierte Nutzer.
+
+**Beispielausgabe:**
+```bash
+nmap -sT MACHINE_IP
+```
+```
+PORT      STATE SERVICE
+22/tcp    open  ssh
+25/tcp    open  smtp
+...
+```
+Optionen: `-F` (100 häufigste Ports), `-r` (Ports sequenziell scannen).
+
+### TCP SYN Scan (`-sS`)
+
+Der „Stealth“-Scan baut die Verbindung nicht vollständig auf. Er erfordert Root-Rechte und ist unauffälliger.
+
+**Beispielausgabe:**
+```bash
+sudo nmap -sS MACHINE_IP
+```
+```
+PORT      STATE SERVICE
+22/tcp    open  ssh
+25/tcp    open  smtp
+80/tcp    open  http
+110/tcp   open  pop3
+111/tcp   open  rpcbind
+143/tcp   open  imap
+MAC Address: 02:45:BF:8A:2D:6B (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.60 seconds
+```
+
+### UDP Scan (`-sU`)
+
+UDP ist verbindungslos und erfordert keinen Handshake. Eine Antwort von einem lauschenden UDP-Dienst ist nicht garantiert. Bei einem geschlossenen Port wird ein ICMP Port Unreachable Fehler (Typ 3, Code 3) zurückgegeben. UDP-Ports ohne Antwort werden von Nmap als offen gemeldet.
+
+**Beispielausgabe:**
+```bash
+pentester@TryHackMe$ sudo nmap -sU MACHINE_IP
+```
+```
+PORT      STATE          SERVICE
+68/udp    open|filtered  dhcpc
+111/udp   open           rpcbind
+MAC Address: 02:45:BF:8A:2D:6B (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 1085.05 seconds
+```
+
+### Port-Spezifikation und Scan-Timing
+
+Ports können spezifisch (`-p22,80,443`), als Bereich (`-p1-1023`), alle (`-p-`), die 100 häufigsten (`-F`) oder die Top N (`--top-ports 10`) gescannt werden.
+
+Das Scan-Timing wird mit `-T<0-5>` gesteuert. `T0` ist am langsamsten (paranoid), `T5` am schnellsten. Standard ist `T3` (normal). Langsame Modi (`T0`, `T1`) können IDS-Alarme vermeiden, sind aber zeitaufwändig. `T4` wird oft in CTFs verwendet, `T1` bei realen Engagements, wo Heimlichkeit wichtig ist.
+
+Alternativ können Paketraten (`--min-rate`, `--max-rate`) und Sondierungsparallelität (`--min-parallelism`, `--max-parallelism`) gesteuert werden.
+
+### Spezielle TCP-Scan-Typen
+
+#### Null Scan (`-sN`)
+
+Sendet ein TCP-Paket ohne gesetzte Flags. Keine Antwort bei offenem Port oder Firewall-Blockade. RST-Antwort bei geschlossenem Port. Erkennt Ports, die nicht geschlossen sind (offen oder gefiltert).
+
+**Beispielausgabe:**
+```bash
+pentester@TryHackMe$ sudo nmap -sN MACHINE_IP
+```
+```
+PORT      STATE          SERVICE
+22/tcp    open|filtered  ssh
+25/tcp    open|filtered  smtp
+80/tcp    open|filtered  http
+110/tcp   open|filtered  pop3
+111/tcp   open|filtered  rpcbind
+143/tcp   open|filtered  imap
+MAC Address: 02:45:BF:8A:2D:6B (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 96.50 seconds
+```
+**Hinweis:** Viele Nmap-Optionen erfordern Root-Rechte (`sudo`).
+
+#### FIN Scan (`-sF`)
+
+Sendet ein TCP-Paket mit gesetztem FIN-Flag. Keine Antwort bei offenem Port oder Firewall-Blockade. RST-Antwort bei geschlossenem Port. Erkennt geschlossene Ports, um auf offene/gefilterte Ports zu schließen.
+
+**Beispielausgabe:**
+```bash
+pentester@TryHackMe$ sudo nmap -sF MACHINE_IP
+```
+```
+PORT      STATE          SERVICE
+22/tcp    open|filtered  ssh
+25/tcp    open|filtered  smtp
+80/tcp    open|filtered  http
+110/tcp   open|filtered  pop3
+111/tcp   open|filtered  rpcbind
+143/tcp   open|filtered  imap
+MAC Address: 02:45:BF:8A:2D:6B (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 96.52 seconds
+```
+
+#### Xmas Scan (`-sX`)
+
+Sendet ein TCP-Paket mit gesetzten FIN, PSH und URG Flags. RST-Antwort bei geschlossenem Port. Andernfalls als `open|filtered` gemeldet.
+
+**Beispielausgabe:**
+```bash
+pentester@TryHackMe$ sudo nmap -sX MACHINE_IP
+```
+```
+PORT      STATE          SERVICE
+22/tcp    open|filtered  ssh
+25/tcp    open|filtered  smtp
+80/tcp    open|filtered  http
+110/tcp   open|filtered  pop3
+111/tcp   open|filtered  rpcbind
+143/tcp   open|filtered  imap
+MAC Address: 02:45:BF:8A:2D:6B (Unknown)
+```
+Diese Scans sind effizient gegen zustandslose Firewalls, die nur auf SYN-Flags prüfen. Zustandsbehaftete Firewalls blockieren solche manipulierten Pakete.
+
+#### TCP Maimon Scan (`-sM`)
+
+Setzt FIN- und ACK-Bits. Erwartet RST-Paket als Antwort. Bestimmte BSD-Systeme verwerfen das Paket bei offenen Ports, wodurch diese sichtbar werden. Funktioniert selten in modernen Netzwerken.
+
+**Beispielausgabe:**
+```bash
+pentester@TryHackMe$ sudo nmap -sM 10.10.252.27
+```
+```
+All 1000 scanned ports on ip-10-10-252-27.eu-west-1.compute.internal (10.10.252.27) are closed
+MAC Address: 02:45:BF:8A:2D:6B (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.61 seconds
+```
+Dieser Scan ist heute meist ineffektiv, aber wichtig für das Verständnis von Port-Scanning-Mechanismen.
+
+#### TCP ACK Scan (`-sA`)
+
+Sendet ein TCP-Paket mit gesetztem ACK-Flag. Das Ziel antwortet mit RST, unabhängig vom Portzustand. Dieser Scan hilft nicht direkt, offene Ports zu finden, ist aber nützlich zur Firewall-Erkennung. Er zeigt, welche Ports von der Firewall nicht blockiert werden.
+
+**Beispielausgabe (ohne Firewall):**
+```bash
+pentester@TryHackMe$ sudo nmap -sA MACHINE_IP
+```
+```
+All 1000 scanned ports on MACHINE_IP are unfiltered
+MAC Address: 02:45:BF:8A:2D:6B (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.68 seconds
+```
+**Beispielausgabe (mit Firewall):**
+```bash
+pentester@TryHackMe$ sudo nmap -sA MACHINE_IP
+```
+```
+Not shown: 997 filtered ports
+PORT      STATE      SERVICE
+22/tcp    unfiltered ssh
+25/tcp    unfiltered smtp
+80/tcp    unfiltered http
+MAC Address: 02:78:C0:D0:4E:E9 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 15.45 seconds
+```
+
+#### TCP Window Scan (`-sW`)
+
+Ähnlich dem ACK Scan, untersucht aber das TCP Window-Feld der RST-Pakete. Kann auf bestimmten Systemen offene Ports aufdecken.
+
+**Beispielausgabe (ohne Firewall):**
+```bash
+pentester@TryHackMe$ sudo nmap -sW MACHINE_IP
+```
+```
+All 1000 scanned ports on ip-10-10-252-27.eu-west-1.compute.internal (10.10.252.27) are closed
+MAC Address: 02:45:BF:8A:2D:6B (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.60 seconds
+```
+**Beispielausgabe (mit Firewall):**
+```bash
+pentester@TryHackMe$ sudo nmap -sW MACHINE_IP
+```
+```
+Not shown: 997 filtered ports
+PORT      STATE   SERVICE
+22/tcp    closed  ssh
+25/tcp    closed  smtp
+80/tcp    closed  http
+MAC Address: 02:78:C0:D0:4E:E9 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 14.84 seconds
+```
+ACK- und Window-Scans sind nützlich zur Firewall-Regelanalyse, nicht zur direkten Diensterkennung.
+
+#### Benutzerdefinierter Scan (`--scanflags`)
+
+Ermöglicht das Experimentieren mit eigenen TCP-Flag-Kombinationen (z.B. `--scanflags RSTSYNFIN`).
+
+### IP- und MAC-Adressen-Spoofing
+
+In bestimmten Netzwerkkonfigurationen kann ein Zielsystem mit einer gespooften IP- oder MAC-Adresse gescannt werden. Dies ist nur vorteilhaft, wenn die Antwort abgefangen werden kann.
+
+**IP-Spoofing (`-S SPOOFED_IP`):**
+1.  Angreifer sendet Paket mit gespoofter Quell-IP an Ziel.
+2.  Ziel antwortet an die gespoofte IP.
+3.  Angreifer fängt Antworten ab.
+Befehl: `nmap -e NET_INTERFACE -Pn -S SPOOFED_IP MACHINE_IP` (Netzwerkschnittstelle und Ping-Scan deaktivieren).
+
+**MAC-Spoofing (`--spoof-mac SPOOFED_MAC`):**
+Nur im selben Subnetz möglich.
+
+### Decoy Scans (`-D`)
+
+Verwenden von Köder-IPs, um die eigene IP-Adresse im Scan-Verkehr zu verbergen. Der Scan scheint von mehreren Quellen zu kommen.
+Beispiel: `nmap -D 10.10.0.1,10.10.0.2,ME MACHINE_IP` oder mit Zufalls-IPs: `nmap -D 10.10.0.1,10.10.0.2,RND,RND,ME MACHINE_IP`.
+
+### Firewall und IDS
+
+*   **Firewall:** Software/Hardware, die Pakete basierend auf Regeln filtert (z.B. "alles blockieren außer Ausnahmen"). Prüft mindestens IP- und Transport-Layer-Header.
+*   **IDS (Intrusion Detection System):** Analysiert Netzwerkpakete auf Verhaltensmuster oder Signaturen und löst bei bösartigen Aktivitäten Alarm aus. Prüft auch Dateninhalte.
+
+**Fragmentierte Pakete (`-f`):**
+Verringert die Wahrscheinlichkeit der Erkennung durch Firewalls/IDS, indem IP-Daten in kleinere Fragmente aufgeteilt werden (standardmäßig 8 Bytes, `-ff` für 16 Bytes, `--mtu` für benutzerdefinierte Vielfache von 8).
+
+### Idle Scan (Zombie Scan) (`-sI`)
+
+Ein verdeckter Scan, der ein untätiges System (Zombie) als Quelle nutzt. Nmap lässt Sonden vom Zombie kommen und prüft dessen IP-Identifikationswert (IP ID), um auf Antworten zu schließen.
+Befehl: `nmap -sI ZOMBIE_IP MACHINE_IP`
+
+**Ablauf:**
+1.  Aktuelle IP ID des Zombies ermitteln.
+2.  SYN-Paket an Ziel senden, gespooft als käme es vom Zombie.
+3.  Erneute Abfrage der IP ID des Zombies, um auf Änderungen zu prüfen.
+
+*   **Port geschlossen:** Ziel antwortet Zombie mit RST. Zombie-IP ID inkrementiert nicht.
+*   **Port offen:** Ziel antwortet Zombie mit SYN/ACK. Zombie antwortet mit RST, wodurch seine IP ID inkrementiert wird.
+
+### Dienst- und Versionserkennung (`-sV`)
+
+Erkennt den Dienst und dessen Version auf offenen Ports.
+`--version-intensity LEVEL` steuert die Intensität (0-9).
+`--version-light` (Intensität 2), `--version-all` (Intensität 9).
+
+**Wichtig:** `-sV` erfordert einen vollständigen TCP 3-Wege-Handshake, um die Version zu ermitteln. Ein Stealth SYN Scan (`-sS`) ist in Kombination mit `-sV` nicht möglich.
+
+**Beispielausgabe:**
+```bash
+pentester@TryHackMe$ sudo nmap -sV MACHINE_IP
+```
+```
+PORT    STATE SERVICE VERSION
+22/tcp  open  ssh     OpenSSH 6.7p1 Debian 5+deb8u8 (protocol 2.0)
+25/tcp  open  smtp    Postfix smtpd
+80/tcp  open  http    nginx 1.6.2
+110/tcp open  pop3    Dovecot pop3d
+111/tcp open  rpcbind 2-4 (RPC #100000)
+MAC Address: 02:A0:E7:B5:B6:C5 (Unknown)
+Service Info: Host:  debra2.thm.local; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 8.40 seconds
+```
+**Hinweis:** Viele Nmap-Optionen erfordern Root-Rechte (`sudo`).
+
+### Betriebssystemerkennung (`-O`)
+
+Nmap kann das Betriebssystem (OS) anhand seines Verhaltens erkennen.
+`nmap -sS -O MACHINE_IP`
+
+**Beispielausgabe:**
+```bash
+pentester@TryHackMe$ sudo nmap -sS -O MACHINE_IP
+```
+```
+PORT    STATE SERVICE
+22/tcp  open  ssh
+25/tcp  open  smtp
+80/tcp  open  http
+110/tcp open  pop3
+111/tcp open  rpcbind
+143/tcp open  imap
+MAC Address: 02:A0:E7:B5:B6:C5 (Unknown)
+Device type: general purpose
+Running: Linux 3.X
+OS CPE: cpe:/o:linux:linux_kernel:3.13
+OS details: Linux 3.13
+Network Distance: 1 hop
+
+OS detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 3.91 seconds
+```
+Die Genauigkeit der OS-Erkennung hängt von Faktoren wie der Anzahl der offenen/geschlossenen Ports und Virtualisierung ab. Ergebnisse sollten mit Vorsicht interpretiert werden.
+
+### Traceroute (`--traceroute`)
+
+Zeigt die Router (Hops) zwischen Scanner und Ziel an. Nmaps Traceroute beginnt mit hohem TTL und verringert diesen.
+
+**Beispielausgabe:**
+```bash
+pentester@TryHackMe$ sudo nmap -sS --traceroute MACHINE_IP
+```
+```
+TRACEROUTE
+HOP RTT     ADDRESS
+1   1.48 ms MACHINE_IP
+
+Nmap done: 1 IP address (1 host up) scanned in 1.59 seconds
+```
+Viele Router senden keine ICMP Time-to-Live exceeded-Nachrichten, was die Erkennung erschwert.
+
+### Nmap Scripting Engine (NSE)
+
+Nmap unterstützt Skripte in Lua, um zusätzliche Funktionen bereitzustellen. Standardmäßig sind Hunderte von Skripten verfügbar (`/usr/share/nmap/scripts`).
+
+**Skript-Kategorien in Nmap:**
+
+| Skript-Kategorie | Beschreibung                                                                |
+| :--------------- | :-------------------------------------------------------------------------- |
+| `auth`           | Authentifizierungsbezogene Skripte                                          |
+| `broadcast`      | Entdeckt Hosts durch Senden von Broadcast-Nachrichten                       |
+| `brute`          | Führt Brute-Force-Passwort-Audits gegen Anmeldungen durch                   |
+| `default`        | Standardskripte (identisch mit `-sC`)                                       |
+| `discovery`      | Ruft zugängliche Informationen ab (z.B. Datenbanktabellen, DNS-Namen)       |
+| `dos`            | Erkennt Server, die anfällig für Denial of Service (DoS) sind               |
+| `exploit`        | Versucht, verschiedene anfällige Dienste auszunutzen                        |
+| `external`       | Prüft unter Verwendung von Drittanbieterdiensten (z.B. Geoplugin, Virustotal) |
+| `fuzzer`         | Startet Fuzzing-Angriffe                                                    |
+| `intrusive`      | Aufdringliche Skripte (z.B. Brute-Force, Exploitation)                      |
+| `malware`        | Sucht nach Backdoors                                                        |
+| `safe`           | Sichere Skripte, die das Ziel nicht zum Absturz bringen                     |
+| `version`        | Ruft Dienstversionen ab                                                     |
+| `vuln`           | Prüft auf Schwachstellen oder nutzt anfällige Dienste aus                  |
+
+Einige Skripte gehören zu mehreren Kategorien. Vorsicht ist geboten, da manche Skripte intrusive Aktionen (Brute-Force, DoS, Exploits) durchführen können.
+
+**Ausführen von Standardskripten (`-sC`):**
+```bash
+pentester@TryHackMe$ sudo nmap -sS -sC MACHINE_IP
+```
+```
+PORT    STATE SERVICE
+22/tcp  open  ssh
+| ssh-hostkey:
+|   1024 d5:80:97:a3:a8:3b:57:78:2f:0a:78:ae:ad:34:24:f4 (DSA)
+|   2048 aa:66:7a:45:eb:d1:8c:00:e3:12:31:d8:76:8e:ed:3a (RSA)
+|   256 3d:82:72:a3:07:49:2e:cb:d9:87:db:08:c6:90:56:65 (ECDSA)
+|_  256 dc:f0:0c:89:70:87:65:ba:52:b1:e9:59:f7:5d:d2:6a (EdDSA)
+25/tcp  open  smtp
+|_smtp-commands: debra2.thm.local, PIPELINING, SIZE 10240000, VRFY, ETRN, STARTTLS, ENHANCEDSTATUSCODES, 8BITMIME, DSN,
+| ssl-cert: Subject: commonName=debra2.thm.local
+| Not valid before: 2021-08-10T12:10:58
+|_Not valid after:  2031-08-08T12:10:58
+|_ssl-date: TLS randomness does not represent time
+80/tcp  open  http
+|_http-title: Welcome to nginx on Debian!
+110/tcp open  pop3
+|_pop3-capabilities: RESP-CODES CAPA TOP SASL UIDL PIPELINING AUTH-RESP-CODE
+111/tcp open  rpcbind
+| rpcinfo:
+|   program version   port/proto   service
+|   100000  2,3,4        111/tcp   rpcbind
+|   100000  2,3,4        111/udp   rpcbind
+|   100024  1          38099/tcp   status
+|_  100024  1          54067/udp   status
+143/tcp open  imap
+|_imap-capabilities: LITERAL+ capabilities IMAP4rev1 OK Pre-login ENABLE have LOGINDISABLEDA0001 listed SASL-IR ID more post-login LOGIN-REFERRALS IDLE
+MAC Address: 02:A0:E7:B5:B6:C5 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 2.21 seconds
+```
+
+**Ausführen spezifischer Skripte (`--script "SCRIPT-NAME"`):**
+```bash
+pentester@TryHackMe$ sudo nmap -sS -n --script "http-date" MACHINE_IP
+```
+```
+PORT    STATE SERVICE
+22/tcp  open  ssh
+25/tcp  open  smtp
+80/tcp  open  http
+|_http-date: Fri, 10 Sep 2021 07:04:26 GMT; 0s from local time.
+110/tcp open  pop3
+111/tcp open  rpcbind
+143/tcp open  imap
+MAC Address: 02:44:87:82:AC:83 (Unknown)
+
+Nmap done: 1 IP address (1 host up) scanned in 1.78 seconds
+```
+Skripte können auch nach Mustern (`--script "ftp*"`) ausgewählt werden. Skripte aus dem Internet sollten nur von vertrauenswürdigen Quellen bezogen werden.
+
+### Speichern von Scan-Ergebnissen
+
+Ergebnisse sollten immer gespeichert werden. Eine gute Namenskonvention ist wichtig.
+
+**Formate:**
+*   **Normal (`-oN FILENAME`):** Ähnlich der Konsolenausgabe.
+    ```bash
+    pentester@TryHackMe$ cat MACHINE_IP_scan.nmap
+    # Nmap 7.60 scan initiated Fri Sep 10 05:14:19 2021 as: nmap -sS -sV -O -oN MACHINE_IP_scan MACHINE_IP
+    Nmap scan report for MACHINE_IP
+    Host is up (0.00086s latency).
+    Not shown: 994 closed ports
+    PORT    STATE SERVICE VERSION
+    22/tcp  open  ssh     OpenSSH 6.7p1 Debian 5+deb8u8 (protocol 2.0)
+    ...
+    ```
+*   **Grepable (`-oG FILENAME`):** Für effizientes Filtern mit `grep`. Kompakter, aber weniger lesbar.
+    ```bash
+    pentester@TryHackMe$ cat MACHINE_IP_scan.gnmap
+    # Nmap 7.60 scan initiated Fri Sep 10 05:14:19 2021 as: nmap -sS -sV -O -oG MACHINE_IP_scan MACHINE_IP
+    Host: MACHINE_IP    Status: Up
+    Host: MACHINE_IP    Ports: 22/open/tcp//ssh//OpenSSH 6.7p1 Debian 5+deb8u8 (protocol 2.0)/, 25/open/tcp//smtp//Postfix smtpd/, 80/open/tcp//http//nginx 1.6.2/, ...
+    ```
+*   **XML (`-oX FILENAME`):** Ideal für die Verarbeitung in anderen Programmen.
+*   **Alle Formate (`-oA FILENAME`):** Speichert in Normal, Grepable und XML.
+*   **Script Kiddie (`-oS FILENAME`):** Unbrauchbares Format, nur zur "Show".
+    ```bash
+    pentester@TryHackMe$ cat MACHINE_IP_scan.kiddie
+
+    $tart!ng nMaP 7.60 ( httpz://nMap.0rG ) at 2021-09-10 05:17 B$T
+    Nmap scan rEp0rt f0r |p-10-10-161-170.EU-w3$t-1.C0mputE.intErnaL (10.10.161.170)
+    HOSt !s uP (0.00095s LatEncy).
+    N0T $H0wn: 994 closed pOrtS
+    PoRT    st4Te SeRViC3 VERS1on
+    22/tcp  Open  ssH     Op3n$$H 6.7p1 Deb|an 5+dEb8u8 (pr0t0COl 2.0)
+    ...
+    ```
+
+### Wichtige Nmap-Befehle und Optionen
+
+| Befehl / Option                   | Beschreibung                                                               |
+| :-------------------------------- | :------------------------------------------------------------------------- |
+| `nmap -sT <Ziel>`                 | TCP Connect Scan (vollständiger Handshake)                                 |
+| `sudo nmap -sS <Ziel>`            | TCP SYN Scan (Stealth, halboffener Handshake)                              |
+| `sudo nmap -sU <Ziel>`            | UDP Scan                                                                   |
+| `sudo nmap -sN <Ziel>`            | Null Scan (keine TCP-Flags)                                                |
+| `sudo nmap -sF <Ziel>`            | FIN Scan (nur FIN-Flag)                                                    |
+| `sudo nmap -sX <Ziel>`            | Xmas Scan (FIN, PSH, URG Flags)                                            |
+| `sudo nmap -sA <Ziel>`            | ACK Scan (Firewall-Regeln erkennen)                                        |
+| `sudo nmap -sW <Ziel>`            | Window Scan (TCP Window-Feld Analyse)                                      |
+| `sudo nmap -sM <Ziel>`            | Maimon Scan (FIN und ACK Flags, selten effektiv)                           |
+| `sudo nmap -sI <Zombie-IP> <Ziel>` | Idle Scan (Zombie Scan, verdeckt über Zombie-Host)                         |
+| `nmap -D <Decoy-IP1>,<Decoy-IP2>,ME <Ziel>` | Decoy Scan (eigene IP tarnen)                                              |
+| `nmap -p22,80,443 <Ziel>`         | Scan spezifischer Ports                                                    |
+| `nmap -p1-1023 <Ziel>`            | Scan eines Portbereichs                                                    |
+| `nmap -p- <Ziel>`                 | Scan aller 65535 Ports                                                     |
+| `nmap -F <Ziel>`                  | Schneller Scan (100 häufigste Ports)                                       |
+| `nmap --top-ports 10 <Ziel>`      | Scan der 10 häufigsten Ports                                              |
+| `nmap -T<0-5> <Ziel>`             | Scan-Timing (0=paranoid, 5=insane, 3=normal)                               |
+| `nmap --min-rate <Rate> <Ziel>`   | Minimale Paketrate pro Sekunde                                             |
+| `nmap --max-rate <Rate> <Ziel>`   | Maximale Paketrate pro Sekunde                                             |
+| `nmap -f <Ziel>`                  | Fragmentierte Pakete senden (IDS/Firewall umgehen)                         |
+| `nmap --mtu <Bytes> <Ziel>`       | MTU für Fragmentierung setzen (Vielfaches von 8)                           |
+| `nmap --data-length <NUM> <Ziel>` | Zufällige Daten an Pakete anhängen                                         |
+| `nmap --spoof-mac <MAC>`          | MAC-Adresse spoofen (im selben Subnetz)                                    |
+| `nmap -S <Spoofed-IP> <Ziel>`     | Quell-IP-Adresse spoofen                                                   |
+| `nmap -e <Interface> <Ziel>`      | Netzwerkschnittstelle angeben (bei Spoofing)                               |
+| `nmap -Pn <Ziel>`                 | Host-Discovery (Ping) überspringen                                         |
+| `nmap -sV <Ziel>`                 | Dienst- und Versionserkennung                                              |
+| `nmap -O <Ziel>`                  | Betriebssystem-Erkennung                                                   |
+| `nmap --traceroute <Ziel>`        | Traceroute zum Ziel durchführen                                            |
+| `nmap -sC <Ziel>`                 | Standardskripte ausführen (entspricht `--script=default`)                  |
+| `nmap --script "<Skriptname>" <Ziel>` | Spezifisches NSE-Skript ausführen                                          |
+| `nmap --script "<Kategorie>" <Ziel>` | NSE-Skripte einer Kategorie ausführen (z.B. `--script=vuln`)               |
+| `nmap -oN <Datei>`                | Ergebnisse im Normalformat speichern                                       |
+| `nmap -oG <Datei>`                | Ergebnisse im Grepable-Format speichern                                    |
+| `nmap -oX <Datei>`                | Ergebnisse im XML-Format speichern                                         |
+| `nmap -oA <Datei>`                | Ergebnisse in allen drei Formaten speichern (`.nmap`, `.gnmap`, `.xml`)    |
+| `nmap -v <Ziel>`                  | Ausführliche Ausgabe                                                       |
+| `nmap -d <Ziel>`                  | Debug-Modus                                                                |
+| `sudo nmap ...`                   | Erfordert Root-Rechte für viele Scan-Typen und Optionen                    |
+
+---
